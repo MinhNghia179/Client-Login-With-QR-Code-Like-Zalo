@@ -8,12 +8,23 @@ const authenticateStep1 = `${BASE_URL}?t=1`;
 const authenticateStep2 = `${BASE_URL}?t=2`;
 
 function App() {
-  const { isLoading, error, data } = useQuery('qrCode', () =>
-    axios.get(authenticateStep1).then(({ data }) => {
-      const response = axios.get(authenticateStep2).then(({ data }) => data);
-      return { ...response, ...data };
-    }),
-  );
+  const {
+    isLoading,
+    error,
+    data: qrCode,
+  } = useQuery('qrCode', () => axios.get(authenticateStep1).then(({ data }) => data));
+
+  const { data: userInfo } = useQuery('confirm', () => axios.get(authenticateStep2).then(({ data }) => data));
+
+  if (!!userInfo) {
+    return (
+      <div>
+        <img src={userInfo.avatar} alt="user name" />
+        <span>{userInfo.display_name}</span>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -26,7 +37,7 @@ function App() {
           <>
             <p>Đăng nhập tài khoản Zalo để kết nối với ứng dụng Zalo Web</p>
             <div className="qrCode">
-              <img src={data.base64Image} alt="qrCode" />
+              <img src={qrCode.image} alt="qrCode" />
             </div>
             <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
               Quét mã QR bằng Zalo để đăng nhập
