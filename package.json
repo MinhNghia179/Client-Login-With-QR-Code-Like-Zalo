@@ -38,6 +38,7 @@
     ]
   },
   "devDependencies": {
+    "lodash": "^4.17.21",
     "socket.io-client": "^4.6.1"
   }
 }
