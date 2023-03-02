@@ -13,17 +13,16 @@ const AUTHENTICATE_KEY_1 = 'qrCode';
 const AUTHENTICATE_KEY_2 = 'confirm';
 
 function App() {
+  const fetchQrCode = () => axios.get(authenticateStep1).then(({ data }) => data);
+  const fetchUserInfo = () => axios.get(authenticateStep2).then(({ data }) => data);
+
   const [qrCode, setQrCode] = useState();
   const [error, setError] = useState();
   const [userInfo, setUserInfo] = useState();
 
-  useQuery(AUTHENTICATE_KEY_1, () => axios.get(authenticateStep1).then(({ data }) => data), {
-    enabled: isEmpty(qrCode),
-    onSuccess: setQrCode,
-    onError: setError,
-  });
+  useQuery(AUTHENTICATE_KEY_1, fetchQrCode, { enabled: isEmpty(qrCode), onSuccess: setQrCode, onError: setError });
 
-  useQuery(AUTHENTICATE_KEY_2, () => axios.get(authenticateStep2).then(({ data }) => data), {
+  useQuery(AUTHENTICATE_KEY_2, fetchUserInfo, {
     enabled: isEmpty(userInfo),
     onSuccess: setUserInfo,
     onError: setError,
@@ -43,15 +42,24 @@ function App() {
             {!!error ? (
               <p>Error: {error.message}</p>
             ) : (
-              <>
+              <div className="card-container">
                 <p>Đăng nhập tài khoản Zalo để kết nối với ứng dụng Zalo Web</p>
-                <div className="qrCode">
+                {userInfo?.isExpired && (
+                  <>
+                    <span className="error-message">Mã QR đã hết hạn, vui lòng tải lại mã mới</span>
+                    <div className="card-expired">
+                      <span className="qr-text">Mã QR hết hạn</span>
+                      <button className="btn-qrCode">Lấy mã mới</button>
+                    </div>
+                  </>
+                )}
+                <div className={`qrCode ${userInfo?.isExpired && 'expired'}`}>
                   <img src={qrCode?.image} alt="qrCode" />
                 </div>
                 <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
                   Quét mã QR bằng Zalo để đăng nhập
                 </a>
-              </>
+              </div>
             )}
           </>
         )}

@@ -38,8 +38,47 @@
   }
 }
 
+.card-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .qrCode {
   margin: 20px;
   padding: 25px;
-  border: 2px solid white;
+  border: 1px solid white;
+}
+
+.expired {
+  opacity: 0.2;
+}
+
+.qr-text {
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.card-expired {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+  margin-top: 50px;
+}
+
+.btn-qrCode {
+  padding: 8px;
+  z-index: 2;
+  border: none;
+  background-color: rgb(63, 131, 233);
+  border-radius: 4px;
+  color: white;
+}
+
+.error-message {
+  color: rgb(155, 48, 48);
+  font-size: 20px;
 }
