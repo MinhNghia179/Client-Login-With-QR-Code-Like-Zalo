@@ -1,32 +1,55 @@
 import axios from 'axios';
-import { isEmpty } from 'lodash';
-import { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useEffect, useState } from 'react';
 import './App.css';
 
 const BASE_URL = 'http://11.30.11.215:3000/account/authen';
 
 const authenticateStep1 = `${BASE_URL}?t=1`;
 const authenticateStep2 = `${BASE_URL}?t=2`;
-
-const AUTHENTICATE_KEY_1 = 'qrCode';
-const AUTHENTICATE_KEY_2 = 'confirm';
+const authenticateStep3 = `${BASE_URL}?t=3`;
 
 function App() {
-  const fetchQrCode = () => axios.get(authenticateStep1).then(({ data }) => data);
-  const fetchUserInfo = () => axios.get(authenticateStep2).then(({ data }) => data);
-
   const [qrCode, setQrCode] = useState();
   const [error, setError] = useState();
+  const [token, setToken] = useState();
   const [userInfo, setUserInfo] = useState();
 
-  useQuery(AUTHENTICATE_KEY_1, fetchQrCode, { enabled: isEmpty(qrCode), onSuccess: setQrCode, onError: setError });
+  const getNewQRCode = async () => {
+    try {
+      const response1 = await axios.post(authenticateStep1);
+      if (response1.data) {
+        setQrCode(response1.data);
+        const response2 = await axios.post(authenticateStep2, { code: response1.data.code });
+        if (response2.data) {
+          setUserInfo(response2.data);
+          getTokenFromUser();
+        }
+      }
+    } catch (error) {
+      setError(error);
+    }
+  };
 
-  useQuery(AUTHENTICATE_KEY_2, fetchUserInfo, {
-    enabled: isEmpty(userInfo),
-    onSuccess: setUserInfo,
-    onError: setError,
-  });
+  const getTokenFromUser = async () => {
+    try {
+      const response = await axios.post(authenticateStep3);
+      setToken(response.data);
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  useEffect(() => {
+    if (!!userInfo) {
+      getTokenFromUser();
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    getNewQRCode();
+  }, []);
+
+  console.log(token);
 
   return (
     <div className="App">
@@ -49,7 +72,9 @@ function App() {
                     <span className="error-message">Mã QR đã hết hạn, vui lòng tải lại mã mới</span>
                     <div className="card-expired">
                       <span className="qr-text">Mã QR hết hạn</span>
-                      <button className="btn-qrCode">Lấy mã mới</button>
+                      <button className="btn-qrCode" onClick={getNewQRCode}>
+                        Lấy mã mới
+                      </button>
                     </div>
                   </>
                 )}
