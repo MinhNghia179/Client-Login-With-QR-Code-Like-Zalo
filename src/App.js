@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import './App.css';
 
-const BASE_URL = 'http://11.30.11.215:3000/account/authen';
+const BASE_URL = 'http://11.30.11.215:8085/account/authen';
 
 const authenticateStep1 = `${BASE_URL}?t=1`;
 const authenticateStep2 = `${BASE_URL}?t=2`;
