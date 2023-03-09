@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import './App.css';
+import { Socket } from './socket';
 
 const BASE_URL = 'http://11.30.11.215:8085/account/authen';
 
@@ -46,10 +47,9 @@ function App() {
   }, [userInfo]);
 
   useEffect(() => {
+    Socket();
     getNewQRCode();
   }, []);
-
-  console.log(token);
 
   return (
     <div className="App">
